@@ -38,11 +38,18 @@ import org.apache.maven.project.MavenProject;
  */
 public class IkvmMavenMojo extends AbstractMojo
 {
+    public static final String IKVMC_EXECUTABLE_NAME = "ikvmc.exe";
     /**
      * Location of the IKVM installation.
      * @parameter expression="${ikvm.path}"
      */
     public File ikvmPath;
+    
+    /**
+     * Location of the IKVMC.exe file
+     * @parameter expression="${ikvmc.path}"
+     */
+    public File ikvmc;
 
     /**
      * The location of the standard library DLLs.
@@ -149,8 +156,11 @@ public class IkvmMavenMojo extends AbstractMojo
             throw new MojoExecutionException(
                 "ikvm.path refers to non- or non-existent directory: " + ikvmPath);
         }
-
-        File ikvmc = new File(new File(ikvmPath, "bin"), "ikvmc.exe");
+        if(ikvmc == null){
+            getLog().info("ikvmc.path not set, defaulting to \"" + ikvmPath.getAbsolutePath() + "/bin/" + IKVMC_EXECUTABLE_NAME + "\"");
+            ikvmc = new File(new File(ikvmPath, "bin"), IKVMC_EXECUTABLE_NAME);
+        }
+        
         if (!ikvmc.exists()) {
             throw new MojoExecutionException("Unable to find ikmvc at: " + ikvmc);
         }
@@ -178,7 +188,7 @@ public class IkvmMavenMojo extends AbstractMojo
         }
 
         // create the command line that executes ikvmc.exe
-        File ikvmcExe = new File(new File(ikvmPath, "bin"), "ikvmc.exe");
+        File ikvmcExe = ikvmc;
         Commandline cli;
         // determine whether to run ikvmc.exe directly or to run via mono
         if (!forceMono && System.getProperty("os.name").contains("Windows")) {
