@@ -19,12 +19,15 @@ One must configure their IKVM installation location in Maven's global settings
         <id>ikvm</id>
         <properties>
           <ikvm.path>${user.home}/projects/ikvm-monotouch</ikvm.path>
-          <!-- ikvmc.path specified where the ikvmc.exe file is located. Defaults to ${ikvm.path}/bin/ikvmc.exe -->
-          <!-- <ikvmc.path>/path/to/ikvmc.exe</ikvmc.path>
-          <!-- mono.path specifies where to find the Mono standard libraries. It defaults to:
+          <!-- ikvmc.path specifies where to find ikvmc.exe. It defaults to:
+               ${ikvm.path}/bin/ikvmc.exe -->
+          <!-- <ikvmc.path>/path/to/ikvmc.exe</ikvmc.path> -->
+          <!-- dll.path specifies where to find the standard libraries. It defaults to:
                /Developer/MonoTouch/usr/lib/mono/2.1
-               but you can customize it to use any other Mono installation. -->
-          <!-- <mono.path>/to/mono/usr/lib/x.x</mono.path> -->
+               You can customize it to use some other Mono installation, or
+               leave it pointing to a non-existent directory to locate standard
+               libraries via the built-in library search path. -->
+          <!-- <dll.path>/path/to/mono/usr/lib/x.x</dll.path> -->
         </properties>
       </profile>
     </profiles>
@@ -89,7 +92,10 @@ Once that's done, the following POM fragment demonstrates the use of this plugin
       </build>
     </project>
 
-Note that the plugin expects `mono` to be in your path on the command line.
+On Windows, the plugin will execute `ikvmc.exe` directly. On non-Windows
+platforms, the plugin expects `mono` to be in your path on the command line.
+You can force the use of Mono even on Windows by adding
+`<force.mono>true</force.mono>` in `<configuration>`.
 
 ## License
 
