@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -122,6 +123,12 @@ public class IkvmMavenMojo extends AbstractMojo
      */
     public ArtifactRepository localRepository;
 
+    /**
+     * Scopes to ignore, a comma separated list.
+     * @parameter expression="${ikvm.ignoredScopes}" default-value=""
+     */
+    public String ikvmIgnoredScopes = "";
+    
     public void execute () throws MojoExecutionException {
         // create our target directory if needed (normally the jar plugin does this, but we don't
         // run the jar plugin)
@@ -161,12 +168,15 @@ public class IkvmMavenMojo extends AbstractMojo
             throw new MojoExecutionException("Unable to find ikmvc at: " + ikvmcPath);
         }
 
+        List<String> ignoredScopesList = Arrays.asList(ikvmIgnoredScopes.split(","));
         // resolve the (non-test) jar dependencies, all of which we'll include in our DLL
         List<File> javaDepends = new ArrayList<File>();
         List<Artifact> dllDepends = new ArrayList<Artifact>();
         try {
             for (Object a : _project.getArtifacts()) {
                 Artifact artifact = (Artifact)a;
+                //Skip this artifact if it is in the list of ignored scopes.
+                if(ignoredScopesList.contains(artifact.getScope())) continue;
                 getLog().debug("Considering artifact [" + artifact.getGroupId() + ":" +
                     artifact.getArtifactId() + "]");
                 // I think @requiresDependencyResolution compile prevents this, but let's be sure.
