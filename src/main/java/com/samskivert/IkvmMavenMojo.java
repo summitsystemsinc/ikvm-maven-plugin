@@ -206,25 +206,31 @@ public class IkvmMavenMojo extends AbstractMojo
         // add our standard args
         List<String> stdArgs = new ArrayList<String>();
         stdArgs.add("-nostdlib");
-        stdArgs.add("-target:library");
+        
         for (String arg : stdArgs) {
             cli.createArgument().setValue(arg);
         }
 
         // add our user defined args (making sure they don't duplicate stdargs)
+        boolean outSetExplicitely = false;
+        boolean targetSetExplicitely = false;
         for (String arg : ikvmArgs) {
             if (stdArgs.contains(arg)) continue;
             if (arg.startsWith("-out:")) {
-                getLog().warn("Don't specify -out:file directly. Set project.build.directory " +
-                              "and project.build.finalName in your POM.");
-                continue;
+                getLog().info("-out: set explicitely");
+                getLog().info(arg);
+                outSetExplicitely = true;
+            }else if(arg.startsWith("-target:")){
+                getLog().info("-target: set explicitely");
+                targetSetExplicitely = true;
             }
             cli.createArgument().setValue(arg);
-        }
-
+        }       
+        
+        if(!targetSetExplicitely) stdArgs.add("-target:library");
         // add our output file
-        cli.createArgument().setValue("-out:" + artifactFile.getAbsolutePath());
-
+        if(!outSetExplicitely) cli.createArgument().setValue("-out:" + artifactFile.getAbsolutePath());
+        
         // add our standard DLLs
         List<String> stdDlls = new ArrayList<String>();
         stdDlls.add("mscorlib.dll");
