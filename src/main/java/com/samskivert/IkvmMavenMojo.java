@@ -240,9 +240,11 @@ public class IkvmMavenMojo extends AbstractMojo
         
         // add our standard DLLs
         List<String> stdDlls = new ArrayList<String>();
+        /**
         stdDlls.add("mscorlib.dll");
         stdDlls.add("System.dll");
         stdDlls.add("System.Core.dll");
+        */
         for (String dll : stdDlls) {
             cli.createArgument().setValue("-r:" + getDLLPath(dll));
         }
